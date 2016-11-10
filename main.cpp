@@ -48,13 +48,9 @@ int selectCard(player *currPlayer){
 }
 void playCard(player *currPlayer,deck *faceUp, int cardSelect){
 	card tmp;
-
 	tmp = currPlayer->getCard(cardSelect);		// Tmp card obj to store card instance
 	faceUp->myDeck.push_back(tmp); 				// Place into faceUp deck	
-	cout << "Card Selected:	" << tmp.show();	cout << endl;// Display card selected
-	currPlayer->hand.erase(currPlayer->hand.begin()+cardSelect-1);
-	// Remove card from hand
-	
+	currPlayer->hand.erase(currPlayer->hand.begin()+cardSelect-1);	// Remove card from hand
 }
 void draw(player *currPlayer,deck *aDeck){
 	card tmp = aDeck->myDeck.back();
@@ -70,6 +66,29 @@ void collectPile(player *currPlayer,deck *aDeck){
 		draw(currPlayer,aDeck);
 	}
 }
+void displayFaceUp(deck *faceUp){
+	if(!faceUp->myDeck.empty()){
+		cout << "FaceUpDeck: " << faceUp->myDeck.back().show() << endl;
+	}else{
+		cout << "FaceUpDeck: " << endl;
+	}
+}
+void sortHand(player *player){
+	int tmp;
+	int sortCount = player->hand.size();
+
+	// Use macros to include debug text >> cout << "Sort()" << endl;
+	
+	for(int j=0;j<=sortCount;j++){					// Number of sortLoops
+		for(int i=0;i<(player->hand.size()-1);i++){
+			if(player->hand[i].getRank() > player->hand[i+1].getRank()){	// swap if a > b
+				tmp = player->hand[i].getRank();							// tmp = a;
+				player->hand[i].setRank(player->hand[i+1].getRank());		// a = b;
+				player->hand[i+1].setRank(tmp);								// b = tmp;
+			}
+		}
+	}
+}
 void displayHand(player *player){
 	int cardWidth = 7;	
 	
@@ -81,7 +100,12 @@ void displayHand(player *player){
 
 	cout << setw(10) << "Player: " << setw(5) << player->playerNumber << setw(cardWidth);
 	for(int i=1;i<=player->hand.size();i++){
-		cout << setw(cardWidth)  << player->hand[i-1].show();
+		if(player->hand[i-1].getRank() != player->hand[i].getRank()){	// If cards are not of same rank print large space
+			cout << setw(cardWidth);
+		}else{
+			cout << setw(6);												// If cards are same rank print small space
+		}
+		cout << player->hand[i-1].show();
 	}cout << endl;
 }
 void displayAllHands(vector<player> *playerSet){
@@ -117,13 +141,7 @@ bool validCard(player* currPlayer,deck *faceUp,int cardSelect, bool* burnFlag){
 
 	// Must test what was last card played before checking what player cards are higher priority
 	// EG faceUp 8 must be tested first before any possible plays of card *********** NB
-
-	// Rule #1 - If no faceUp deck(No previous cards to check) any card can be played
-	if(faceUp->myDeck.size() == 0){			
-		return true;
-	}
-	
-	/*
+		
 	// Rule # - 10 can be played on all cards except 8 which cannot be played on
 	if(currPlayer->getCard(cardSelect).getRank() == 10){
 		// empty faceUpdeck - completed in while loop
@@ -131,7 +149,12 @@ bool validCard(player* currPlayer,deck *faceUp,int cardSelect, bool* burnFlag){
 		// Allow player to play another card - flag
 		*burnFlag = true;
 		return true;
-	}*/
+	}
+
+	// Rule #1 - If no faceUp deck(No previous cards to check) any card can be played
+	if(faceUp->myDeck.empty()){			
+		return true;
+	}
 
 	// Rule #2 - 2 can be played on anything
 	if(currPlayer->getCard(cardSelect).getRank() == 2){
@@ -143,29 +166,35 @@ bool validCard(player* currPlayer,deck *faceUp,int cardSelect, bool* burnFlag){
 	}
 	
 	// Rule #3b - if 3 is top of faceUp deck
-	if(faceUp->myDeck.back().getRank() == 3 ){
-		if(currPlayer->getCard(cardSelect).getRank() >= faceUp->myDeck[faceUp->myDeck.size()-2].getRank() ){	// 2nd last card
-			return true;
-		}else{
-			return false;
+	if(!faceUp->myDeck.empty()){						// Must test if deck has cards otherwise .back() leads to seg fault
+		if(faceUp->myDeck.back().getRank() == 3 && faceUp->myDeck.size()>=2){
+			if(currPlayer->getCard(cardSelect).getRank() >= faceUp->myDeck[faceUp->myDeck.size()-2].getRank() ){	// 2nd last card
+				return true;
+			}else{
+				return false;
+			}
 		}
 	}
-	/*
+	
 	// Rule #4 - if top of deck is 7 >> flip priority order 
 	// >> cards must be of lower value for the time when 7 is the top of the deck
-	if(faceUp->myDeck.back().getRank() == 7 ){
-		if(currPlayer->getCard(cardSelect).getRank() < 7){
-			return true;
-		}else{
-			return false;	// If this is not present next rule will deal with this case incorrectly
+	if(!faceUp->myDeck.empty()){						// If deck is not empty
+		if(faceUp->myDeck.back().getRank() == 7 ){
+			if(currPlayer->getCard(cardSelect).getRank() <= 7){
+				return true;
+			}else{
+				return false;	// If this is not present next rule will deal with this case incorrectly
+			}
 		}
-	}*/
+	}
 
 	// Rule #6 - 
 	// in general larger priority is valid once all special cases are tested first 2,3,7,8,10
 	// 7 can be played on < 7 therfore >> no rule required as it is regular priority
-	if(currPlayer->getCard(cardSelect).getRank() > faceUp->myDeck.back().getRank()){
-		return true;
+	if(!faceUp->myDeck.empty()){	// Avoid Seg Faults
+		if(currPlayer->getCard(cardSelect).getRank() >= faceUp->myDeck.back().getRank()){
+			return true;
+		}
 	}
 	return false;
 }
@@ -189,7 +218,8 @@ void selectPlayers(){
 int main()
 {	
 	bool cardValid = false;
-	bool burnFlag = false;
+	bool aBurnFlag = false;
+	bool skippedFlag = false;
 	bool deckEmpty;
 	int aCardWidth = 7;
 	int cardSelect = -1;
@@ -209,40 +239,65 @@ int main()
 
 	// Turn
 	// while p1hand OR p2hand not empty AND all cards are drawn from faceDown
-	while( (playerSet[0].hand.size() >  0 || playerSet[1].hand.size() >  0) && !faceDown.myDeck.empty() ){ 
+	while(playerSet[0].hand.size() >  0 || playerSet[1].hand.size() >  0){ 
 		++turnCount;	// Increment turn count
 		turn = turnCount % numberOfPlayers;
 
 		// Turn
 		// Test to skip player
 		// As soon as deck has a card and its an 8 keeps skipping 
-		if(faceUp.myDeck.empty(){
-
+		if(!faceUp.myDeck.empty()){						// If deck is not empty
+			if(faceUp.myDeck.back().getRank() == 8 && skippedFlag == false){	// If top of faceUpDeck==8 >> skip
+				cout << "skip" << endl;
+				skippedFlag = true;
+			}
+			else{										// otherwise == If top of faceUpDeck!=8 >> turn
+				cout << "Turn" << endl;
+				displayFaceUp(&faceUp);
+				sortHand(&(playerSet[turn]));
+				displayHand(&(playerSet[turn]));
+				//displayAllHands(&playerSet);	
+				cardSelect = selectCard(&(playerSet[turn]));
+				cardValid = validCard(&(playerSet[turn]),&faceUp,cardSelect,&aBurnFlag);
+				
+				if(cardValid){
+					playCard(&(playerSet[turn]),&faceUp,cardSelect);
+					draw(&playerSet[turn],&faceDown);		// draw() fx will cause while loop to exit once the last card is drawn
+					cout << "draw()" << endl;
+					cardValid = false;
+				}else{
+					collectPile(&(playerSet)[turn],&faceUp);
+					cout << "You had to collectPile" << endl;
+				}
+				skippedFlag = false;	
+			}	
 		}
-		if(faceUp.myDeck.back().getRank() == 8){	// If top of faceUpDeck==8
-			cout << "skip" << endl;
-		}
-		else{	
+		else{	//if the deck is empty just perform/Allow a turn >> No tests required for 8
 			cout << "Turn" << endl;
-		// If faceUpDeck is empty >> @start of game
-		// or if card != 8
-		// or if card != 8 and faceUp is empty
-			displayHand(&(playerSet[turn]));
-			//displayAllHands(&playerSet);	
+			displayFaceUp(&faceUp);	
+			sortHand(&(playerSet[turn]));	
+			displayHand(&(playerSet[turn]));	
 			cardSelect = selectCard(&(playerSet[turn]));
-			cardValid = validCard(&(playerSet[turn]),&faceUp,cardSelect,&burnFlag);
+			cardValid = validCard(&(playerSet[turn]),&faceUp,cardSelect,&aBurnFlag);
 			
 			if(cardValid){
 				playCard(&(playerSet[turn]),&faceUp,cardSelect);
 				draw(&playerSet[turn],&faceDown);		// draw() fx will cause while loop to exit once the last card is drawn
 				cout << "draw()" << endl;
-				cardValid = false;
-			}else{
+				cardValid = false;}
+			else{
 				collectPile(&(playerSet)[turn],&faceUp);
 				cout << "You had to collectPile" << endl;
-			}	
-		}	
-	}
+			}
+		}
+		// Burn baby burn disco inferno
+		if(aBurnFlag){
+			cout << "Ohh Burn" << endl;
+			faceUp.myDeck.clear();			// Burn faceUp deck
+			--turnCount;					// Decrement turn count so current play is same player next loop of while statement
+			aBurnFlag = false;				// Reset Flag
+		}
+	}	
 	if(!playerSet[0].getNumCards()){	// p0 has no cards left in hand AND no cards left in deck
 			cout << "p0 wins" << endl;
 			cout << "ctrl-c to exit" << endl;
