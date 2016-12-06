@@ -1,15 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////////////////
-//	Title:
+//	Title:			player.cpp
 //	Author:			William Walsh
-//	Date:
-//	Time:
-//	Book:			C++ for Dummies - Book4 - Advanced Programming
-//	Listing:
-//	Elaboration:
+//	Date:			26-10-16
+//	Elaboration:	player class member function definitions.
 //////////////////////////////////////////////////////////////////////////////////////////
 //pre-processor///////////////////////////////////////////////////////////////////////////
 #include <iostream>
-// string not required as no strings present types in file
 #include "player.h"
 using namespace std;
 //fx defn/////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +14,7 @@ void player::showHand(){
 	if(size == 0){
 		cout << "player>>showHand>>hand.size()==0" << endl;
 	}
-	for(int i=0;i<size;i++){	// 5 cards >> 0-4
+	for(int i=0;i<size;i++){	// 5 cards initially >> 0-4
 		cout << hand[i].show();
 	}
 }

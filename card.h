@@ -1,17 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////////////////
-//	Title:			Card class definition
+//	Title:			card.h
 //	Author:			William Walsh
 //	Date:			26-10-16
-//	Time:			02:51
-//	Book:			
-//	Listing:
 //	Elaboration:	card class definition with forward declarations for functions.
-//					corresponding fxs are listed in card.cpp
+//					corresponding functions are listed in card.cpp
 //////////////////////////////////////////////////////////////////////////////////////////
 //pre-processor///////////////////////////////////////////////////////////////////////////
 #ifndef CARD_H
 #define CARD_H
-//#include <string> // string required??
 //class definition////////////////////////////////////////////////////////////////////////
 class card{
 private:
@@ -35,7 +31,7 @@ public:
 	// Constructors
 	card(){}
 	card(int rankIn,int suitIn):rank(rankIn),suit(suitIn){}
-};	//End of card class
+};
 #endif
 
 

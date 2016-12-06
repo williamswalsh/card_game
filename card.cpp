@@ -1,17 +1,18 @@
 //////////////////////////////////////////////////////////////////////////////////////////
-//	Title:
+//	Title:			card.cpp
 //	Author:			William Walsh
-//	Date:
-//	Time:
-//	Book:			C++ for Dummies - Book4 - Advanced Programming
-//	Listing:
-//	Elaboration:
+//	Date:			26-10-16
+//	Elaboration:	card class member function definitions.
 //////////////////////////////////////////////////////////////////////////////////////////
 //pre-processor///////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include "card.h"
 using namespace std;
 //fx defn/////////////////////////////////////////////////////////////////////////////////
+/*
+ showRank()
+ returns rank of card in string form
+*/
 string card::showRank(){
 	string rankStr;
 	switch(rank){
@@ -66,6 +67,11 @@ string card::showRank(){
 	}	//End of switch(rank)
 	return rankStr;
 }
+/*
+ showSuit()
+ returns suit of card in string form
+ uses unicode to display card suit symbols.
+*/
 string card::showSuit(){
 	string suitStr;
 	switch(suit){
@@ -90,6 +96,15 @@ string card::showSuit(){
 	}	//End of switch(suit)
 	return suitStr;
 }
+/*
+ show()
+ returns concatenation of card suit and card rank in string form
+*/
+string card::show(){
+	string a = showRank();
+	string b = showSuit();
+	return a+b;	//Concatenate strings
+}
 int card::getRank(){
 	return rank;
 }
@@ -106,11 +121,7 @@ void card::set(int rankIn, int suitIn){
 	setRank(rankIn);
 	setSuit(suitIn);
 }			
-string card::show(){
-	string a = showRank();
-	string b = showSuit();
-	return a+b;	//Concatenate strings
-}	//End of show()
+
 
 
 

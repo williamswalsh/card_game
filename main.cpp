@@ -2,29 +2,30 @@
 //	Title:			main.cpp 
 //	Author:			William Walsh
 //	Date:			7-Nov-2016
-//	Time:			02:33
-//	Book:			C++ for Dummies - Book4 - Advanced Programming
-//					
-//	Elaboration:	main file for a card game called "Shithead".
+//	Elaboration:	main file for a card game called "Palace".
 //					Each class has its own header file and cpp file.
 //					Header file contains member variables, function declarations and constructors.
 //					Associated cpp file contains function definitions.
 //////////////////////////////////////////////////////////////////////////////////////////
 //pre-processor///////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include <iomanip>	// setw()
+#include <iomanip>	// setw() function
 #include "card.h"
 #include "deck.h"
 #include "player.h"
 using namespace std;
 //fx defn/////////////////////////////////////////////////////////////////////////////////
-// Initial deal of cards at beginning of a game
-// Parameters	pointers to player 1 object and player 2 object and pointer to a full deck of cards
-// Return		void
+
+/*
+ Initial deal of cards at beginning of a game
+ Parameters	pointers to player 1 object and player 2 object and pointer to a full deck of cards
+ Return		void
+*/
 void initialDeal(player *p1,player *p2,deck *deck){
 	card tmp;
-	while(p1->hand.size() <5 || p2->hand.size() <5){	//
-		tmp = deck->myDeck.back();
+	while(p1->hand.size() <5 || p2->hand.size() <5){	// Only exits while loop once both 
+														// players have 5 cards.
+		tmp = deck->myDeck.back();						
 		deck->myDeck.pop_back();
 		p1->hand.push_back(tmp);
 		
@@ -33,30 +34,50 @@ void initialDeal(player *p1,player *p2,deck *deck){
 		p2->hand.push_back(tmp);
 	}
 }
-// Parameter - pointer to player
-// return - int - 0-4 card selected
+int findCardSameRank(player *currPlayer,int cardSelect){
+	int save = -1;
+	int rank = currPlayer->hand[cardSelect].getRank();
+
+	int i;		// ERROR: if define int i within for loop >> name lookup of ‘i’ changed for ISO ‘for’ scoping [-fpermissive]
+	for( i=0; i<currPlayer->hand.size(); i++ ){
+		if(rank == currPlayer->hand[i].getRank()){
+			save = i;
+		}
+	}
+	return i;
+}
+/* selectCard prompts player to select a card to play from hand
+ Parameter - pointer to player
+ return - int - 0-4 card selected
+*/
 int selectCard(player *currPlayer){
-	int cardSelect = 52; // 0-51 - 52 >> Invalid selection
+	int cardSelect = 52; // 0-51 - (52 >> Invalid selection)
 	cout << endl;
 	cout << "Player " << currPlayer->playerNumber << " Which card would you like to play? ";
 	cin >> cardSelect;	// 1 = 1st card		
+
+	// while player selects a cards position larger than hand size.
+	// or player selects a card position that is less than 1.
 	while(cardSelect > currPlayer->getNumCards() || cardSelect < 1){	
-		cout << "Player " << currPlayer->playerNumber << " Invalid Selection. Choose a number from 0-4" << endl;
+		cout << "Player " << currPlayer->playerNumber << " Invalid Selection. Choose a number from 1 to " << currPlayer->hand.size() << endl;
 		cin >> cardSelect;		// if invalid selection >> reject & re-ask
 	}
 	return cardSelect;
 }
+
+
 void playCard(player *currPlayer,deck *faceUp, int cardSelect){
 	card tmp;
 	tmp = currPlayer->getCard(cardSelect);		// Tmp card obj to store card instance
 	faceUp->myDeck.push_back(tmp); 				// Place into faceUp deck	
 	currPlayer->hand.erase(currPlayer->hand.begin()+cardSelect-1);	// Remove card from hand
 }
+
+// draw a card from the faceDown deck
 void draw(player *currPlayer,deck *aDeck){
 	card tmp = aDeck->myDeck.back();
 	aDeck->myDeck.pop_back();
 	currPlayer->hand.push_back(tmp);
-	//cout << "drw";tmp.show(); DEBUG
 }
 
 void collectPile(player *currPlayer,deck *aDeck){
@@ -73,12 +94,11 @@ void displayFaceUp(deck *faceUp){
 		cout << "FaceUpDeck: " << endl;
 	}
 }
+// Sorts cards in players hand in ascending order based on rank
 void sortHand(player *player){
 	int tmp;
 	int sortCount = player->hand.size();
 
-	// Use macros to include debug text >> cout << "Sort()" << endl;
-	
 	for(int j=0;j<=sortCount;j++){					// Number of sortLoops
 		for(int i=0;i<(player->hand.size()-1);i++){
 			if(player->hand[i].getRank() > player->hand[i+1].getRank()){	// swap if a > b
@@ -129,18 +149,19 @@ void displayAllHands(vector<player> *playerSet){
 }
 
 bool validCard(player* currPlayer,deck *faceUp,int cardSelect, bool* burnFlag){
-	// Rules
-	// NB: Return False if no corresponding rule to make card valid - Failsafe **
-	//
-	// If no cards in faceUp deck >> you can pay any card >> any card valid
-	// If selected card 2 >> You can play it on anything >> Next card is >2
-	// If selected card 3 >> Card Valid >> Next card >> previous card effect
-	// selected 7 >> play on <7 >> next card <7 
-	// selected 8 >> skip next player move
-	// 10 >> play on anything >> empty faceUp >> same player move ** 
+	/* Rules
+	 NB: Return False if no corresponding rule to make card valid - Failsafe **
+	
+	 If no cards in faceUp deck >> you can pay any card >> any card valid
+	 If selected card 2 >> You can play it on anything >> Next card is >2
+	 If selected card 3 >> Card Valid >> Next card >> previous card effect
+	 selected 7 >> play on <7 >> next card <7 
+	 selected 8 >> skip next player move
+	 10 >> play on anything >> empty faceUp >> same player move ** 
 
-	// Must test what was last card played before checking what player cards are higher priority
-	// EG faceUp 8 must be tested first before any possible plays of card *********** NB
+	 Must test what was last card played before checking what player cards are higher priority
+	 EG faceUp 8 must be tested first before any possible plays of card *********** NB
+	*/
 		
 	// Rule # - 10 can be played on all cards except 8 which cannot be played on
 	if(currPlayer->getCard(cardSelect).getRank() == 10){
@@ -204,16 +225,6 @@ ostream &operator <<(ostream &out, card &card){
 	out << card.showSuit();
 	return out;
 }
-/*MOdify this later to have adjustable player creation
-void selectPlayers(){
-	int numberOfCPUs = -1;
-	while(numberOfCPUs < 1 || numberOfCPUs >1){
-		cout << "Select the number of CPUs you want to play against:	" << endl;
-		cin >> numberOfCPUs;
-	}
-	int numberOfPlayers = numberOfCPUs + 1;
-}*/
-// FIX enter character when selecting card number and bOOM!! :D Invalid Selection displayed repeatedly
 //main////////////////////////////////////////////////////////////////////////////////////
 int main()
 {	
@@ -236,7 +247,11 @@ int main()
 	int numberOfPlayers = 2;	// Fixed to 2 1 player 1 CPU at present
 
 	initialDeal(&(playerSet[0]),&(playerSet[1]),&faceDown);
-
+	
+	//int capture_me = 
+	//cout << findCardSameRank(&(playerSet[0]),2);
+	// /cout << capture_me << endl;
+	
 	// Turn
 	// while p1hand OR p2hand not empty AND all cards are drawn from faceDown
 	while(playerSet[0].hand.size() >  0 || playerSet[1].hand.size() >  0){ 
@@ -305,14 +320,7 @@ int main()
 	if(!playerSet[1].getNumCards()){	// p1 no cards left in hand AND no cards left in deck
 		cout << "p1 wins" << endl;
 		cout << "ctrl-c to exit" << endl;
-	}
+	}		
 	return 0;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
