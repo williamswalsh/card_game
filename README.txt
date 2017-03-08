@@ -1,9 +1,9 @@
 Palace Card Game:
 ==========================
-+ 52 Card Deck is shuffled - face down deck
-+ 5 cards are dealt to each player from face down deck
++ 52 Card Deck is shuffled and referred to as the "face down deck".
++ 5 cards are dealt to each player from the face down deck.
 + Loop >> while both players have cards AND face down deck isn't empty
->> Current player prompted to choose a card to play
+>> Current player prompted to choose a card to play to the face up deck.
 >> Plays card
 >> Draws card from face down deck and adds the card to players hand
 >> If card selected to play cannot be played then that player must collect
