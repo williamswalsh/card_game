@@ -46,5 +46,5 @@ Cards:
 
 Misc. Rules:
 ============
-If no cards in faceUp deck >> you can pay any card >> any card valid
+If no cards in faceUp deck >> you can play any card >> any card valid
 	
