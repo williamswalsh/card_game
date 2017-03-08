@@ -9,6 +9,11 @@ Palace Card Game:
 >> If card selected to play cannot be played then that player must collect
 >> the pile of face up cards
 
+Play-able Card:
+===============
++ Card that is higher in rank than last card placed in the face up deck 
++ OR if the card is a magic card which can be played also.
+
 Cards:
 ======
 + A - card with highest rank
