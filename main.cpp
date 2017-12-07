@@ -3,10 +3,11 @@
 //	Author:			William Walsh
 //	Date:			7-Nov-2016
 //	Elaboration:	main file for a card game called "Palace".
-//					Each class has its own header file and cpp file.
-//					Header file contains member variables, function declarations and constructors.
-//					Associated cpp file contains function definitions.
+//			Each class has its own header file and cpp file.
+//			Header file contains member variables, function declarations and constructors.
+//			Associated cpp file contains function definitions.
 //////////////////////////////////////////////////////////////////////////////////////////
+
 //pre-processor///////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <iomanip>	// setw() function
@@ -17,7 +18,7 @@ using namespace std;
 //fx defn/////////////////////////////////////////////////////////////////////////////////
 
 /*
- Initial deal of cards at beginning of a game
+ Initial dealing of cards to players at beginning of a game
  Parameters	pointers to player 1 object and player 2 object and pointer to a full deck of cards
  Return		void
 */
@@ -305,7 +306,8 @@ int main()
 				cout << "You had to collectPile" << endl;
 			}
 		}
-		// Burn baby burn disco inferno
+		// Burn Cards -> Remove the cards in the faceup deck from play.
+		// The faceup deck is empty after its is "burned".
 		if(aBurnFlag){
 			cout << "Ohh Burn" << endl;
 			faceUp.myDeck.clear();			// Burn faceUp deck
