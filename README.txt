@@ -11,8 +11,8 @@ Palace Card Game:
 
 Playable Card:
 ===============
-+ Card that is higher in rank than last card placed in the face up deck 
-+ OR if the card is a magic card which can be played also.
++ A Card that is higher in rank than the last played card in the face up deck 
++ OR if the card is a magic card which is playable depending on the card below.
 
 Cards:
 ======
