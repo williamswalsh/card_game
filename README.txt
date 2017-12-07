@@ -1,5 +1,10 @@
 Palace Card Game:
 ==========================
+A card game using a standard playing deck.
+Which can be played by 2 playe
+
+
+
 + 52 Card Deck is shuffled and referred to as the "face down deck".
 + 5 cards are dealt to each player from the face down deck.
 + Loop >> while both players have cards AND face down deck isn't empty
